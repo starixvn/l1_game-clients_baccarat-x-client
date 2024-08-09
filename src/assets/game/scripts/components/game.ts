@@ -1,10 +1,12 @@
 import gc from "@sg/game-client-base";
-import { _decorator, Node } from "cc";
+import { _decorator, assetManager, director, game, Node } from "cc";
 import { startGame } from "db://shared-components/shared/scripts/startup";
 import Observer from "observer";
 import { BaccaratXCardsUI } from "../../../../extensions/shared-components/assets/game-baccarat/cards/baccarat-x-cards-ui";
 import { AudioContainer } from "../../../../extensions/shared-components/assets/game/audios/scripts/component/audio-container";
 import { ChipFlying } from "../../../../extensions/shared-components/assets/game/chip-flying/scripts/components/chip-flying";
+import { InGameMenuEvents } from "../../../../extensions/shared-components/assets/game/in-game-menu/scripts/stores/in-game-menu-events";
+import { InGameMenuStore } from "../../../../extensions/shared-components/assets/game/in-game-menu/scripts/stores/in-game-menu-store";
 import { CardModel } from "../../../../extensions/shared-components/assets/game/poker-cards/scripts/poker-card";
 import GameComponent from "../../../../extensions/shared-components/assets/game/scripts/components/game-component";
 import { WinningResult } from "../../../../extensions/shared-components/assets/shared/common-components/winning-result/scripts/winning-result";
@@ -171,5 +173,41 @@ export default class Game extends GameComponent {
         } else if (roundState === Rounds.ROUND_STATE.SHOW_RESULT) {
             this.audioContainer.updateVolumeMusicSource(1, 3);
         }
+    }
+
+    @render(InGameMenuStore, (store) => store.event, { fireImmediately: false })
+    async handleGoToLobby({ event }: { event: InGameMenuEvents }) {
+        if (event === InGameMenuEvents.GO_TO_LOBBY) {
+            await this.forceCleanup();
+        }
+    }
+
+    async forceCleanup() {
+        // Unbind Store
+        const container = gc.getContainer(containerOptions);
+
+        await container.unbindAllAsync();
+        await container.parent.unbindAllAsync();
+        console.log("container after unbind", container);
+
+        // Clear asset manager cache
+        assetManager?.assets?.clear();
+        assetManager?.bundles?.clear();
+        assetManager?.cacheManager?.clearCache();
+        assetManager?.cacheManager?.clearLRU();
+
+        // Clear all loaded scenes
+        director?.purgeDirector();
+        director.getScheduler().destroy();
+
+        // Clear all actions
+        director?.removeAll(game);
+
+        // Force garbage collection again
+        if (typeof global !== "undefined" && global.gc) {
+            global?.gc();
+        }
+
+        game?.pause();
     }
 }
