@@ -14,7 +14,7 @@ import { containerOptions, settings } from "../game-settings";
 import "./../../../resources/i18n";
 
 startGame(settings.name, containerOptions, siteConfigs, settings.namespaces);
-const { Rounds, Connection, HideGame, Settlements, FormatUtils, RoundHistories, GameBaccaratX } = gc;
+const { Rounds, RoundHistories, GameBaccaratX } = gc;
 
 const { ccclass, property } = _decorator;
 const { observer, render, handle } = Observer;
@@ -171,5 +171,14 @@ export default class Game extends GameComponent {
         } else if (roundState === Rounds.ROUND_STATE.SHOW_RESULT) {
             this.audioContainer.updateVolumeMusicSource(1, 3);
         }
+    }
+
+    async forceCleanup() {
+        super.forceCleanup();
+
+        // Unbind Store
+        const container = gc.getContainer(containerOptions);
+        await container.unbindAllAsync();
+        await container.parent.unbindAllAsync();
     }
 }
