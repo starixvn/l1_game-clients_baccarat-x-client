@@ -24,6 +24,8 @@ export const containerOptions: gc.IContainerOptions = {
     onContainerCreated: (container) => {
         container.bind(gc.GameConfigs.GameSetting).toConstantValue(settings);
         container.bind(LogStore).to(LogStore);
+        container.bind(gc.Rounds.RoundTimeStore).toService(gc.GameBaccaratX.Rounds.RoundTimeStore);
+
     },
     features: [...gc.defaultFeatures, gc.BetDetailsNew, gc.GameBaccaratX],
 };
