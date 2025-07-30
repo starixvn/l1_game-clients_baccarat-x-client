@@ -10,7 +10,8 @@ import GameComponent from "../../../../extensions/shared-components/assets/game/
 import { WinningResult } from "../../../../extensions/shared-components/assets/shared/common-components/winning-result/scripts/winning-result";
 import { FunctionUtils } from "../../../../extensions/shared-components/assets/shared/utils";
 import { siteConfigs } from "../../../scripts/site-configs";
-import { containerOptions, settings } from "../game-settings";
+import { containerOptions } from "../containerOptions";
+import { settings } from "../game-settings";
 import "./../../../resources/i18n";
 
 startGame(settings.name, containerOptions, siteConfigs, settings.namespaces);
